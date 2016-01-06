@@ -15,7 +15,9 @@ import java.util.ArrayList;
 import java.util.List;
 
 import me.liujia95.googleplayer.R;
+import me.liujia95.googleplayer.base.BaseFragment;
 import me.liujia95.googleplayer.fragment.HomeFragment;
+import me.liujia95.googleplayer.utils.LogUtils;
 
 public class HomeActivity extends AppCompatActivity {
 
@@ -23,7 +25,7 @@ public class HomeActivity extends AppCompatActivity {
     private ActionBarDrawerToggle mDrawerToggle;
     private Toolbar               mToolBar;
     private ViewPager             mViewpager;
-    private List<Fragment>        mFragments;
+    private List<BaseFragment>    mFragments;
     private TabLayout             mTabLayout;
 
     @Override
@@ -32,6 +34,7 @@ public class HomeActivity extends AppCompatActivity {
         setContentView(R.layout.activity_home);
 
         initView();
+        initListener();
         initToolBar();
         initData();
     }
@@ -46,6 +49,27 @@ public class HomeActivity extends AppCompatActivity {
         mTabLayout = (TabLayout) findViewById(R.id.home_tablayout);
     }
 
+    private void initListener() {
+        mViewpager.setOnPageChangeListener(new ViewPager.OnPageChangeListener() {
+            @Override
+            public void onPageScrolled(int position, float positionOffset, int positionOffsetPixels) {
+
+            }
+
+            @Override
+            public void onPageSelected(int position) {
+                BaseFragment fragment = mFragments.get(position);
+                fragment.loadData();
+                LogUtils.d(position + ")加载中......");
+            }
+
+            @Override
+            public void onPageScrollStateChanged(int state) {
+
+            }
+        });
+    }
+
     /**
      * 初始化actionbar
      */
@@ -54,11 +78,15 @@ public class HomeActivity extends AppCompatActivity {
         setSupportActionBar(mToolBar);
         mToolBar.setTitle("GooglePlay");
         mToolBar.setLogo(R.drawable.ic_launcher);
-        mToolBar.setNavigationIcon(R.drawable.ic_drawer_am);
 
         //创建开关
         mDrawerToggle = new ActionBarDrawerToggle(this, mDrawerLayout, mToolBar, R.string.open, R.string.close);
+        mDrawerToggle.setHomeAsUpIndicator(R.drawable.ic_drawer_am);
         mDrawerToggle.syncState();
+
+        //一定要放在syncState方法之后，syncState方法调用时会将图标重置
+        mToolBar.setNavigationIcon(R.drawable.ic_drawer_am);
+        mToolBar.setNavigationContentDescription("aaa");
     }
 
     /**
@@ -73,6 +101,10 @@ public class HomeActivity extends AppCompatActivity {
         //设置适配器，tablayout和viewpager的绑定
         mViewpager.setAdapter(new HomeFragmentAdapter(getSupportFragmentManager()));
         mTabLayout.setupWithViewPager(mViewpager);
+
+        //因为viewpager初始化是不会走onPageSelected事件，要手动让它加载一次
+        mViewpager.setCurrentItem(1);
+        mViewpager.setCurrentItem(0);
     }
 
     private class HomeFragmentAdapter extends FragmentPagerAdapter {

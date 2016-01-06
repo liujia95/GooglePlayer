@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <declare-styleable name="CircleProgressButton">
+        <!-- 进度的宽度 -->
+        <attr name="strokeWidth" format="float"/>
+        <!-- 进度的颜色 -->
+        <attr name="strokeColor" format="color"/>
+    </declare-styleable>
+</resources>

@@ -6,3 +6,6 @@
 .DS_Store
 /build
 /captures
+/app/*.log
+/app/replay_pid13420.log
+/*.log
