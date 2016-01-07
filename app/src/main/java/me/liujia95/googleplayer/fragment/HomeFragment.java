@@ -3,23 +3,17 @@ package me.liujia95.googleplayer.fragment;
 import android.view.View;
 import android.widget.ListView;
 
-import com.google.gson.Gson;
-import com.lidroid.xutils.HttpUtils;
-import com.lidroid.xutils.http.RequestParams;
-import com.lidroid.xutils.http.ResponseStream;
-import com.lidroid.xutils.http.client.HttpRequest;
-
 import java.util.List;
 
 import me.liujia95.googleplayer.R;
 import me.liujia95.googleplayer.adapter.SuperBaseAdapter;
 import me.liujia95.googleplayer.adapter.viewholder.AppItemHolder;
 import me.liujia95.googleplayer.adapter.viewholder.BaseHolder;
+import me.liujia95.googleplayer.adapter.viewholder.HomeTopHolder;
 import me.liujia95.googleplayer.base.BaseFragment;
 import me.liujia95.googleplayer.bean.AppInfoBean;
 import me.liujia95.googleplayer.bean.HomeBean;
-import me.liujia95.googleplayer.utils.Constants;
-import me.liujia95.googleplayer.utils.LogUtils;
+import me.liujia95.googleplayer.protocol.HomeProtocol;
 import me.liujia95.googleplayer.utils.UIUtils;
 
 /**
@@ -29,23 +23,14 @@ public class HomeFragment extends BaseFragment {
 
     private List<AppInfoBean> mDatas;
     private List<String>      mPictures;
+    private HomeProtocol mProtocol;
 
     //这个方法本身就是在子线程
     @Override
     protected LoadingUI.ResultState onStartLoadData() {
-        HttpUtils httpUtils = new HttpUtils();
-        String url = Constants.BASE_SERVER + "home";
-
-        RequestParams params = new RequestParams();
-        params.addQueryStringParameter("index", "" + 0);
+        mProtocol = new HomeProtocol();
         try {
-            ResponseStream responseStream = httpUtils.sendSync(HttpRequest.HttpMethod.GET, url, params);
-            String json = responseStream.readString();
-            LogUtils.d("json:" + json);
-
-            //解析json
-            Gson gson = new Gson();
-            HomeBean bean = gson.fromJson(json, HomeBean.class);
+            HomeBean bean = mProtocol.loadData(0);
 
             if (bean == null) {
                 return LoadingUI.ResultState.EMPTY;
@@ -69,8 +54,13 @@ public class HomeFragment extends BaseFragment {
     @Override
     protected View onInitSuccessView() {
         ListView mListView = new ListView(UIUtils.getContext());
-        mListView.setAdapter(new HomeAdapter(mDatas));
         mListView.setBackgroundResource(R.color.bg);
+
+        HomeTopHolder topHolder = new HomeTopHolder();
+        mListView.addHeaderView(topHolder.getRootView());
+        topHolder.setData(mPictures);
+
+        mListView.setAdapter(new HomeAdapter(mDatas));
         return mListView;
     }
 
@@ -84,5 +74,22 @@ public class HomeFragment extends BaseFragment {
         protected BaseHolder<AppInfoBean> getItemHolder() {
             return new AppItemHolder();
         }
+
+        @Override
+        public List<AppInfoBean> onLoadMoreData() throws Exception {
+
+            return loadMore(mDatas.size());
+        }
+    }
+
+    private List<AppInfoBean> loadMore(int index) throws Exception {
+
+        HomeBean bean = mProtocol.loadData(index);
+
+        if (bean == null) {
+            return null;
+        }
+
+        return bean.list;
     }
 }

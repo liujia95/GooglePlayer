@@ -1,5 +1,15 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
+
+    <declare-styleable name="RatioLayout">
+        <!--宽高比的值-->
+        <attr name="ratio" format="float"/>
+        <attr name="relative">
+            <enum name="width" value="0"/>
+            <enum name="height" value="1"/>
+        </attr>
+    </declare-styleable>
+
     <declare-styleable name="CircleProgressButton">
         <!-- 进度的宽度 -->
         <attr name="strokeWidth" format="float"/>

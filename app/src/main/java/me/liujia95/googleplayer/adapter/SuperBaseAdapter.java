@@ -1,5 +1,6 @@
 package me.liujia95.googleplayer.adapter;
 
+import android.os.SystemClock;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.BaseAdapter;
@@ -22,6 +23,7 @@ public abstract class SuperBaseAdapter<T> extends BaseAdapter {
     private static final int TYPE_LOADMORE = 0;
     private static final int TYPE_NORMAL   = 1;
     private LoadMoreHolder mLoadMoreHolder;
+    private LoadMoreTask   mLoadMoreTask;
 
     public SuperBaseAdapter(List<T> datas) {
         mDatas = datas;
@@ -98,11 +100,17 @@ public abstract class SuperBaseAdapter<T> extends BaseAdapter {
      * 执行加载更多操作
      */
     private void perfromLoadMore() {
+        //如果正在执行加载更多的操作，退出操作，不能重复执行
+        if (mLoadMoreTask != null) {
+            return;
+        }
+
         //改变状态
         mLoadMoreHolder.setData(LoadMoreHolder.STATE_LOADING);
 
         //加载数据
-        ThreadPoolManager.getLongPool().execute(new LoadMoreTask());
+        mLoadMoreTask = new LoadMoreTask();
+        ThreadPoolManager.getLongPool().execute(mLoadMoreTask);
 
     }
 
@@ -115,6 +123,8 @@ public abstract class SuperBaseAdapter<T> extends BaseAdapter {
             int state = LoadMoreHolder.STATE_LOADING;
             List<T> datas = null;
             try {
+                SystemClock.sleep(2000);
+
                 datas = onLoadMoreData();
                 if (datas == null || datas.size() == 0) {
                     state = LoadMoreHolder.STATE_EMPTY;
@@ -139,10 +149,15 @@ public abstract class SuperBaseAdapter<T> extends BaseAdapter {
                 @Override
                 public void run() {
                     mLoadMoreHolder.setData(currentState);
-                    mDatas.addAll(finalDatas);
-                    notifyDataSetChanged();
+                    if (finalDatas != null) {
+                        mDatas.addAll(finalDatas);
+                        notifyDataSetChanged();
+                    }
                 }
             });
+
+            //加载更多已完成，任务制空
+            mLoadMoreTask = null;
         }
     }
 
@@ -151,7 +166,7 @@ public abstract class SuperBaseAdapter<T> extends BaseAdapter {
      *
      * @return
      */
-    private List<T> onLoadMoreData() throws Exception {
+    public List<T> onLoadMoreData() throws Exception {
         return null;
     }
 
@@ -174,6 +189,13 @@ public abstract class SuperBaseAdapter<T> extends BaseAdapter {
     public BaseHolder getLoadMoreHolder() {
         if (mLoadMoreHolder == null) {
             mLoadMoreHolder = new LoadMoreHolder();
+            //给重试设置监听
+            mLoadMoreHolder.setOnRetryListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    perfromLoadMore();
+                }
+            });
         }
         return mLoadMoreHolder;
     }

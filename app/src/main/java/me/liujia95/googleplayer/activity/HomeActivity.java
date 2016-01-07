@@ -15,9 +15,14 @@ import java.util.ArrayList;
 import java.util.List;
 
 import me.liujia95.googleplayer.R;
+import me.liujia95.googleplayer.animation.ZoomOutPageTransformer;
 import me.liujia95.googleplayer.base.BaseFragment;
+import me.liujia95.googleplayer.fragment.AppFragment;
+import me.liujia95.googleplayer.fragment.GameFragment;
 import me.liujia95.googleplayer.fragment.HomeFragment;
+import me.liujia95.googleplayer.fragment.SubjectFragment;
 import me.liujia95.googleplayer.utils.LogUtils;
+import me.liujia95.googleplayer.utils.UIUtils;
 
 public class HomeActivity extends AppCompatActivity {
 
@@ -27,6 +32,7 @@ public class HomeActivity extends AppCompatActivity {
     private ViewPager             mViewpager;
     private List<BaseFragment>    mFragments;
     private TabLayout             mTabLayout;
+    private String[]              mTitles;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -35,9 +41,12 @@ public class HomeActivity extends AppCompatActivity {
 
         initView();
         initListener();
+        initAnimation();
         initToolBar();
+
         initData();
     }
+
 
     /**
      * 初始化布局
@@ -71,6 +80,13 @@ public class HomeActivity extends AppCompatActivity {
     }
 
     /**
+     * 初始化动画
+     */
+    private void initAnimation() {
+        mViewpager.setPageTransformer(true, new ZoomOutPageTransformer());
+    }
+
+    /**
      * 初始化actionbar
      */
     private void initToolBar() {
@@ -85,8 +101,7 @@ public class HomeActivity extends AppCompatActivity {
         mDrawerToggle.syncState();
 
         //一定要放在syncState方法之后，syncState方法调用时会将图标重置
-        mToolBar.setNavigationIcon(R.drawable.ic_drawer_am);
-        mToolBar.setNavigationContentDescription("aaa");
+        //mToolBar.setNavigationIcon(R.drawable.ic_drawer_am);
     }
 
     /**
@@ -94,13 +109,21 @@ public class HomeActivity extends AppCompatActivity {
      */
     private void initData() {
         mFragments = new ArrayList<>();
-        for (int i = 0; i < 5; i++) {
-            mFragments.add(new HomeFragment());
-        }
+        mFragments.add(new HomeFragment());
+        mFragments.add(new AppFragment());
+        mFragments.add(new GameFragment());
+        mFragments.add(new SubjectFragment());
+        mFragments.add(new HomeFragment());
+        mFragments.add(new HomeFragment());
+        mFragments.add(new HomeFragment());
+
+        //获取tabs的title
+        mTitles = UIUtils.getStringArray(R.array.pagers);
 
         //设置适配器，tablayout和viewpager的绑定
         mViewpager.setAdapter(new HomeFragmentAdapter(getSupportFragmentManager()));
         mTabLayout.setupWithViewPager(mViewpager);
+        mTabLayout.setTabMode(TabLayout.MODE_SCROLLABLE);
 
         //因为viewpager初始化是不会走onPageSelected事件，要手动让它加载一次
         mViewpager.setCurrentItem(1);
@@ -125,7 +148,7 @@ public class HomeActivity extends AppCompatActivity {
 
         @Override
         public CharSequence getPageTitle(int position) {
-            return "title";
+            return mTitles[position];
         }
     }
 }
