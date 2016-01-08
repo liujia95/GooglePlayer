@@ -55,6 +55,10 @@ public abstract class SuperBaseAdapter<T> extends BaseAdapter {
         if (position == getCount() - 1) {
             return TYPE_LOADMORE;
         }
+        return getNormalViewType(position);
+    }
+
+    protected int getNormalViewType(int position) {
         return TYPE_NORMAL;
     }
 
@@ -69,10 +73,10 @@ public abstract class SuperBaseAdapter<T> extends BaseAdapter {
         int viewType = getItemViewType(position);
         if (convertView == null) {
 
-            if (viewType == TYPE_NORMAL) {
-                viewholder = getItemHolder();
-            } else if (viewType == TYPE_LOADMORE) {
+            if (viewType == TYPE_LOADMORE) {
                 viewholder = getLoadMoreHolder();
+            } else {
+                viewholder = getItemHolder(position);
             }
 
             convertView = viewholder.getRootView();
@@ -82,16 +86,16 @@ public abstract class SuperBaseAdapter<T> extends BaseAdapter {
             viewholder = (BaseHolder) convertView.getTag();
         }
         //设置数据
-        if (viewType == TYPE_NORMAL) {
-            T datas = mDatas.get(position);
-            viewholder.setData(datas);
-        } else {
+        if (viewType == TYPE_LOADMORE) {
             if (hasLoadMore()) {
                 //加载更多操作
                 perfromLoadMore();
             } else {
                 viewholder.setData(LoadMoreHolder.STATE_EMPTY);
             }
+        } else {
+            T datas = mDatas.get(position);
+            viewholder.setData(datas);
         }
         return convertView;
     }
@@ -175,11 +179,11 @@ public abstract class SuperBaseAdapter<T> extends BaseAdapter {
      *
      * @return
      */
-    private boolean hasLoadMore() {
+    protected boolean hasLoadMore() {
         return true;
     }
 
-    protected abstract BaseHolder<T> getItemHolder();
+    protected abstract BaseHolder<T> getItemHolder(int position);
 
     /**
      * 加载更多

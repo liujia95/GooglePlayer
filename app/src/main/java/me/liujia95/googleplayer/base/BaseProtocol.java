@@ -1,5 +1,6 @@
 package me.liujia95.googleplayer.base;
 
+import com.google.gson.Gson;
 import com.lidroid.xutils.HttpUtils;
 import com.lidroid.xutils.exception.HttpException;
 import com.lidroid.xutils.http.RequestParams;
@@ -12,6 +13,9 @@ import java.io.File;
 import java.io.FileReader;
 import java.io.FileWriter;
 import java.io.IOException;
+import java.lang.reflect.ParameterizedType;
+import java.lang.reflect.Type;
+import java.util.Map;
 
 import me.liujia95.googleplayer.utils.Constants;
 import me.liujia95.googleplayer.utils.IOUtils;
@@ -81,7 +85,19 @@ public abstract class BaseProtocol<T> {
         String url = Constants.BASE_SERVER + getInterfacePath();
 
         RequestParams params = new RequestParams();
-        params.addQueryStringParameter("index", "" + index);
+
+        Map<String, String> paramses = getParamters();
+
+        if (paramses == null) {
+            params.addQueryStringParameter("index", "" + index);
+        } else {
+            for (Map.Entry<String, String> me : paramses.entrySet()) {
+                String key = me.getKey();
+                String value = me.getValue();
+                params.addQueryStringParameter(key, value);
+            }
+        }
+
         ResponseStream responseStream = httpUtils.sendSync(HttpRequest.HttpMethod.GET, url, params);
         String json = responseStream.readString();
 
@@ -90,6 +106,15 @@ public abstract class BaseProtocol<T> {
 
         //解析json
         return parseJson(json);
+    }
+
+    /**
+     * 有多余的参数复写此方法
+     *
+     * @return
+     */
+    protected Map<String, String> getParamters() {
+        return null;
     }
 
     /**
@@ -117,6 +142,13 @@ public abstract class BaseProtocol<T> {
 
     protected abstract String getInterfacePath();
 
-    protected abstract T parseJson(String json);
+    protected T parseJson(String json) {
+        //获取类上面的表象泛型
+        ParameterizedType type = (ParameterizedType) this.getClass().getGenericSuperclass();
+        //获取真实的泛型类型（第1个）
+        Type t = type.getActualTypeArguments()[0];
+        return new Gson().fromJson(json, t);
+
+    }
 
 }

@@ -1,7 +1,5 @@
 package me.liujia95.googleplayer.protocol;
 
-import com.google.gson.Gson;
-
 import me.liujia95.googleplayer.base.BaseProtocol;
 import me.liujia95.googleplayer.bean.HomeBean;
 
@@ -15,10 +13,10 @@ public class HomeProtocol extends BaseProtocol<HomeBean> {
         return "home";
     }
 
-    @Override
-    protected HomeBean parseJson(String json) {
-        return new Gson().fromJson(json, HomeBean.class);
-    }
+//    @Override
+//    protected HomeBean parseJson(String json) {
+//        return new Gson().fromJson(json, HomeBean.class);
+//    }
 
 
 }

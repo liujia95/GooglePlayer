@@ -6,9 +6,7 @@ import android.widget.ListView;
 import java.util.List;
 
 import me.liujia95.googleplayer.R;
-import me.liujia95.googleplayer.adapter.SuperBaseAdapter;
-import me.liujia95.googleplayer.adapter.viewholder.AppItemHolder;
-import me.liujia95.googleplayer.adapter.viewholder.BaseHolder;
+import me.liujia95.googleplayer.adapter.AppListAdapter;
 import me.liujia95.googleplayer.adapter.viewholder.HomeTopHolder;
 import me.liujia95.googleplayer.base.BaseFragment;
 import me.liujia95.googleplayer.bean.AppInfoBean;
@@ -23,7 +21,7 @@ public class HomeFragment extends BaseFragment {
 
     private List<AppInfoBean> mDatas;
     private List<String>      mPictures;
-    private HomeProtocol mProtocol;
+    private HomeProtocol      mProtocol;
 
     //这个方法本身就是在子线程
     @Override
@@ -60,24 +58,19 @@ public class HomeFragment extends BaseFragment {
         mListView.addHeaderView(topHolder.getRootView());
         topHolder.setData(mPictures);
 
-        mListView.setAdapter(new HomeAdapter(mDatas));
+        mListView.setAdapter(new HomeAdapter(mDatas, mListView));
         return mListView;
     }
 
-    private class HomeAdapter extends SuperBaseAdapter<AppInfoBean> {
+    private class HomeAdapter extends AppListAdapter {
 
-        public HomeAdapter(List<AppInfoBean> datas) {
-            super(datas);
-        }
 
-        @Override
-        protected BaseHolder<AppInfoBean> getItemHolder() {
-            return new AppItemHolder();
+        public HomeAdapter(List<AppInfoBean> datas, ListView listview) {
+            super(datas, listview);
         }
 
         @Override
         public List<AppInfoBean> onLoadMoreData() throws Exception {
-
             return loadMore(mDatas.size());
         }
     }

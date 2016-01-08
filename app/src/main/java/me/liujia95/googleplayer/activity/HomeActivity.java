@@ -18,8 +18,11 @@ import me.liujia95.googleplayer.R;
 import me.liujia95.googleplayer.animation.ZoomOutPageTransformer;
 import me.liujia95.googleplayer.base.BaseFragment;
 import me.liujia95.googleplayer.fragment.AppFragment;
+import me.liujia95.googleplayer.fragment.CategoryFragment;
 import me.liujia95.googleplayer.fragment.GameFragment;
 import me.liujia95.googleplayer.fragment.HomeFragment;
+import me.liujia95.googleplayer.fragment.HotFragment;
+import me.liujia95.googleplayer.fragment.RecommendFragment;
 import me.liujia95.googleplayer.fragment.SubjectFragment;
 import me.liujia95.googleplayer.utils.LogUtils;
 import me.liujia95.googleplayer.utils.UIUtils;
@@ -113,9 +116,9 @@ public class HomeActivity extends AppCompatActivity {
         mFragments.add(new AppFragment());
         mFragments.add(new GameFragment());
         mFragments.add(new SubjectFragment());
-        mFragments.add(new HomeFragment());
-        mFragments.add(new HomeFragment());
-        mFragments.add(new HomeFragment());
+        mFragments.add(new RecommendFragment());
+        mFragments.add(new CategoryFragment());
+        mFragments.add(new HotFragment());
 
         //获取tabs的title
         mTitles = UIUtils.getStringArray(R.array.pagers);

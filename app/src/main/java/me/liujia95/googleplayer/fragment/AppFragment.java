@@ -6,9 +6,7 @@ import android.widget.ListView;
 import java.util.List;
 
 import me.liujia95.googleplayer.R;
-import me.liujia95.googleplayer.adapter.SuperBaseAdapter;
-import me.liujia95.googleplayer.adapter.viewholder.AppItemHolder;
-import me.liujia95.googleplayer.adapter.viewholder.BaseHolder;
+import me.liujia95.googleplayer.adapter.AppListAdapter;
 import me.liujia95.googleplayer.base.BaseFragment;
 import me.liujia95.googleplayer.bean.AppInfoBean;
 import me.liujia95.googleplayer.protocol.AppProtocol;
@@ -41,19 +39,14 @@ public class AppFragment extends BaseFragment {
     protected View onInitSuccessView() {
         ListView mListView = new ListView(UIUtils.getContext());
         mListView.setBackgroundResource(R.color.bg);
-        mListView.setAdapter(new AppAdapter(mDatas));
+        mListView.setAdapter(new AppAdapter(mDatas, mListView));
         return mListView;
     }
 
-    private class AppAdapter extends SuperBaseAdapter<AppInfoBean> {
+    private class AppAdapter extends AppListAdapter {
 
-        public AppAdapter(List<AppInfoBean> datas) {
-            super(datas);
-        }
-
-        @Override
-        protected BaseHolder<AppInfoBean> getItemHolder() {
-            return new AppItemHolder();
+        public AppAdapter(List<AppInfoBean> datas, ListView listview) {
+            super(datas, listview);
         }
 
         @Override
